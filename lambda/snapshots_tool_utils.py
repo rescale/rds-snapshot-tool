@@ -335,7 +335,7 @@ def copy_local(snapshot_identifier, snapshot_object):
         response = client.copy_db_snapshot(
             SourceDBSnapshotIdentifier = snapshot_object['Arn'],
             TargetDBSnapshotIdentifier = snapshot_identifier,
-            KmsKeyId = _KMS_KEY_SOURCE_REGION,
+            KmsKeyId = _KMS_KEY_DEST_REGION,
             Tags = tags)
 
     else:
