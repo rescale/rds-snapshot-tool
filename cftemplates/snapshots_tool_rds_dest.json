@@ -112,7 +112,10 @@
 			},
 			"ap-southeast-1": {
 				"Bucket": "snapshots-tool-rds-ap-southeast-1-real"
-			}
+			},
+      "us-gov-west-1": {
+        "Bucket": ""
+      }
 		}
 	},
 	"Resources": {
@@ -237,7 +240,9 @@
 									"logs:CreateLogStream",
 									"logs:PutLogEvents"
 								],
-								"Resource": "arn:aws:logs:*:*:*"
+								"Resource": {
+                  "Fn::Join" : [ ":", [ "arn", { "Ref" : "AWS::Partition" }, "logs:*:*:*" ] ]
+                }
 							}]
 						}
 					},
