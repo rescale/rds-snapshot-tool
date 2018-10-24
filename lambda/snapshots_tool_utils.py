@@ -228,7 +228,11 @@ def get_own_snapshots_source(pattern, response):
 
             if search_tag_created(response_tags):
                 filtered[snapshot['DBSnapshotIdentifier']] = {
-                    'Arn': snapshot['DBSnapshotArn'], 'Status': snapshot['Status'], 'DBInstanceIdentifier': snapshot['DBInstanceIdentifier']}
+                    'Arn': snapshot['DBSnapshotArn'],
+                    'Status': snapshot['Status'],
+                    'DBInstanceIdentifier': snapshot['DBInstanceIdentifier'],
+                    'SnapshotCreateTime': snapshot['SnapshotCreateTime'],
+                }
 
     return filtered
 

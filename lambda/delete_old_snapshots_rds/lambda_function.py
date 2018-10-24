@@ -40,22 +40,20 @@ def lambda_handler(event, context):
     response = paginate_api_call(client, 'describe_db_snapshots', 'DBSnapshots')
 
     filtered_list = get_own_snapshots_source(PATTERN, response)
-
     for snapshot in filtered_list.keys():
 
-        creation_date = get_timestamp(snapshot, filtered_list)
+        creation_date = filtered_list[snapshot]['SnapshotCreateTime']
 
         if creation_date:
+            creation_date = creation_date.replace(tzinfo=None)
             difference = datetime.now() - creation_date
             days_difference = difference.total_seconds() / 3600 / 24
-            logger.debug('%s created %s days ago' %
+            logger.info('%s created %s days ago' %
                          (snapshot, days_difference))
-
             # if we are past RETENTION_DAYS
             if days_difference > RETENTION_DAYS:
                 # delete it
                 logger.info('Deleting %s' % snapshot)
-
                 try:
                     client.delete_db_snapshot(
                         DBSnapshotIdentifier=snapshot)
@@ -63,10 +61,11 @@ def lambda_handler(event, context):
                 except Exception:
                     pending_delete += 1
                     logger.info('Could not delete %s ' % snapshot)
-
-        else: 
-            logger.info('Not deleting %s. Created only %s' % (snapshot, days_difference))
-
+            else:
+                logger.info('Not deleting %s. Created only %s days ago' % (snapshot, days_difference))
+        else:
+            logger.info(
+                'Not deleting %s. Did not find a timestamp' % snapshot)
 
     if pending_delete > 0:
         message = 'Snapshots pending delete: %s' % pending_delete
@@ -76,5 +75,3 @@ def lambda_handler(event, context):
 
 if __name__ == '__main__':
     lambda_handler(None, None)
-
-
